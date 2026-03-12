@@ -49,12 +49,8 @@
 	<android minimum-sdk-version="21" target-sdk-version="33" if="android" />
 
 	<!-- Required runtime permissions -->
-	<permission name="android.permission.INTERNET"              if="android" />
-	<permission name="android.permission.VIBRATE"               if="android" />
-	<!-- Storage permissions needed only if you ever write saves to external storage.
-	     Internal app storage (getFilesDir) works without these. -->
-	<permission name="android.permission.READ_EXTERNAL_STORAGE"  if="android" />
-	<permission name="android.permission.WRITE_EXTERNAL_STORAGE" if="android" />
+	<permission name="android.permission.INTERNET" if="android" />
+	<permission name="android.permission.VIBRATE"  if="android" />
 
 	<!-- _____________________________ Path Settings ____________________________ -->
 
@@ -193,8 +189,8 @@
 		Discord RPC — desktop only (no Android support in this lib).
 		Lua scripting via linc_luajit — desktop only (JIT not available on Android).
 	-->
-	<haxelib name="discord_rpc"  if="windows" />
-	<haxelib name="linc_luajit"  if="windows" />
+	<haxelib name="discord_rpc" if="windows" />
+	<haxelib name="linc_luajit" if="windows" />
 
 	<!-- <haxelib name="hxcpp-debug-server" if="desktop" /> -->
 
@@ -237,8 +233,8 @@
 		the code that checks  #if discord_rpc / #if linc_luajit
 		compiles cleanly without those libraries on Android.
 	-->
-	<haxedef name="NO_DISCORD"   if="android" />
-	<haxedef name="NO_LUAJIT"    if="android" />
+	<haxedef name="NO_DISCORD" if="android" />
+	<haxedef name="NO_LUAJIT"  if="android" />
 
 	<!-- _________________________________ Custom _______________________________ -->
 
