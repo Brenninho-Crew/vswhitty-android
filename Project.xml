@@ -2,182 +2,257 @@
 <project>
 	<!-- _________________________ Application Settings _________________________ -->
 
-	<app title="Friday Night Funkin' Kade Engine" file="Kade Engine" packageName="com.ninjamuffin99.funkin" package="com.ninjamuffin99.funkin" main="Main" version="0.2.7.1" company="ninjamuffin99" />
+	<app title="FNF: Vs Whitty" file="VsWhitty" packageName="com.ninjamuffin99.funkinwhitty" package="com.ninjamuffin99.funkinwhitty" main="Main" version="0.2.7.1" company="ninjamuffin99" />
 
-	<!--Switch Export with Unique ApplicationID and Icon-->
+	<!-- Switch Export with Unique ApplicationID and Icon -->
 	<set name="APP_ID" value="0x0100f6c013bbc000" />
 
-	<!--The flixel preloader is not accurate in Chrome. You can use it regularly if you embed the swf into a html file
-		or you can set the actual size of your file manually at "FlxPreloaderBase-onUpdate-bytesTotal"-->
+	<!-- The flixel preloader is not accurate in Chrome. You can use it regularly if you embed the swf into a html file
+		or you can set the actual size of your file manually at "FlxPreloaderBase-onUpdate-bytesTotal" -->
 	<!-- <app preloader="Preloader" resizable="true" /> -->
 	<app preloader="flixel.system.FlxPreloader" />
 
-	<!--Minimum without FLX_NO_GAMEPAD: 11.8, without FLX_NO_NATIVE_CURSOR: 11.2-->
+	<!-- Minimum without FLX_NO_GAMEPAD: 11.8, without FLX_NO_NATIVE_CURSOR: 11.2 -->
 	<set name="SWF_VERSION" value="11.8" />
 
 	<!-- ____________________________ Window Settings ___________________________ -->
 
-	<!--These window settings apply to all targets-->
+	<!-- These window settings apply to all targets -->
 	<window width="1280" height="720" fps="" background="#000000" hardware="true" vsync="false" />
 
-	<!--HTML5-specific-->
+	<!-- HTML5-specific -->
 	<window if="html5" resizable="true" />
 
-	<!--Desktop-specific-->
-	<window if="desktop" orientation="landscape" fullscreen="false" resizable="true" vsync="false"/>
+	<!-- Desktop-specific -->
+	<window if="desktop" orientation="landscape" fullscreen="false" resizable="true" vsync="false" />
 
-	<!--Mobile-specific-->
-	<window if="mobile" orientation="landscape" fullscreen="true" width="0" height="0" resizable="false"/>
+	<!-- Mobile-specific (covers both Android and iOS) -->
+	<window if="mobile" orientation="landscape" fullscreen="true" width="0" height="0" resizable="false" />
 
-	<!--Switch-specific-->
+	<!-- Switch-specific -->
 	<window if="switch" orientation="landscape" fullscreen="true" width="0" height="0" resizable="true" />
+
+	<!-- __________________________ Android Settings ___________________________ -->
+
+	<!--
+		Android SDK / NDK requirements:
+		  - Android SDK API level 21+ (Android 5.0 Lollipop and above)
+		  - NDK r21e recommended
+		  - Java 11
+
+		Assets are embedded inside the APK via OpenFL's asset system,
+		so no file extraction to external storage is required at runtime.
+		All asset reads must use openfl.utils.Assets instead of sys.io.File.
+	-->
+
+	<!-- Target and minimum Android API levels -->
+	<android minimum-sdk-version="21" target-sdk-version="33" if="android" />
+
+	<!-- Required runtime permissions -->
+	<permission name="android.permission.INTERNET"              if="android" />
+	<permission name="android.permission.VIBRATE"               if="android" />
+	<!-- Storage permissions needed only if you ever write saves to external storage.
+	     Internal app storage (getFilesDir) works without these. -->
+	<permission name="android.permission.READ_EXTERNAL_STORAGE"  if="android" />
+	<permission name="android.permission.WRITE_EXTERNAL_STORAGE" if="android" />
 
 	<!-- _____________________________ Path Settings ____________________________ -->
 
-	<set name="BUILD_DIR" value="export/debug" if="debug" />
-	<set name="BUILD_DIR" value="export/release" unless="debug" />
-	<set name="BUILD_DIR" value="export/32bit" if="32bit" />
+	<set name="BUILD_DIR" value="export/debug"   if="debug" />
+	<set name="BUILD_DIR" value="export/release"  unless="debug" />
+	<set name="BUILD_DIR" value="export/32bit"    if="32bit" />
 
 	<classpath name="source" />
 
-	<assets path="assets/preload" rename="assets" exclude="*.ogg" if="web"/>
-	<assets path="assets/preload" rename="assets" exclude="*.mp3" unless="web"/>
-	
+	<!-- __________________________ Asset Definitions __________________________ -->
+
+	<!--
+		ANDROID AUDIO NOTE:
+		  Android supports OGG natively; MP3 licences are complicated on Android.
+		  The rules below already exclude .mp3 on non-web targets (which includes Android).
+		  OGG files will be embedded inside the APK automatically by OpenFL.
+
+		NO FILE EXTRACTION:
+		  All asset sections below use OpenFL's normal asset pipeline.
+		  On Android, OpenFL serves these via the AssetManager / APK stream —
+		  no extraction to /sdcard or getExternalFilesDir() is needed.
+		  Never call sys.io.File.getContent() on Android; use Assets.getText() instead.
+	-->
+
+	<!-- Preload assets (web excludes OGG, everything else excludes MP3) -->
+	<assets path="assets/preload" rename="assets" exclude="*.ogg" if="web" />
+	<assets path="assets/preload" rename="assets" exclude="*.mp3" unless="web" />
+
+	<!-- Fonts are always embedded so text renders correctly on Android -->
+	<assets path="assets/fonts" embed="true" />
+
+	<!-- ________________________ Library Preload Flags _________________________ -->
+
 	<!-- <define name="PRELOAD_ALL" /> -->
 	<define name="PRELOAD_ALL" unless="web" />
-	<define name="NO_PRELOAD_ALL" unless="PRELOAD_ALL"/>
-	
-	<section if="PRELOAD_ALL">
-		<library name="songs"    preload="true" />
-		<library name="shared"   preload="true" />
-		<library name="tutorial" preload="true" />
-		<library name="week1"    preload="true" />
-		<library name="week2"    preload="true" />
-		<library name="week3"    preload="true" />
-		<library name="week4"    preload="true" />
-		<library name="week5"    preload="true" />
-		<library name="week6"    preload="true" />
-		<library name="bonusWeek"    preload="true" />
-	</section>
-	
-	<section if="NO_PRELOAD_ALL">
-		<library name="songs"    preload="false" />
-		<library name="shared"   preload="false" />
-		<library name="tutorial" preload="false" />
-		<library name="week1"    preload="false" />
-		<library name="week2"    preload="false" />
-		<library name="week3"    preload="false" />
-		<library name="week4"    preload="false" />
-		<library name="week5"    preload="false" />
-		<library name="week6"    preload="false" />
-		<library name="bonusWeek"    preload="false" />
-	</section>
-	
-	<assets path="assets/songs"    library="songs"    exclude="*.ogg" if="web"/>
-	<assets path="assets/songs"    library="songs"    exclude="*.mp3" unless="web"/>
-	<assets path="assets/shared"   library="shared"   exclude="*.ogg" if="web"/>
-	<assets path="assets/shared"   library="shared"   exclude="*.mp3" unless="web"/>
-	<assets path="assets/tutorial" library="tutorial" exclude="*.ogg" if="web"/>
-	<assets path="assets/tutorial" library="tutorial" exclude="*.mp3" unless="web"/>
-	<assets path="assets/week1"    library="week1"    exclude="*.ogg" if="web"/>
-	<assets path="assets/week1"    library="week1"    exclude="*.mp3" unless="web"/>
-	<assets path="assets/week2"    library="week2"    exclude="*.ogg" if="web"/>
-	<assets path="assets/week2"    library="week2"    exclude="*.mp3" unless="web"/>
-	<assets path="assets/week3"    library="week3"    exclude="*.ogg" if="web"/>
-	<assets path="assets/week3"    library="week3"    exclude="*.mp3" unless="web"/>
-	<assets path="assets/week4"    library="week4"    exclude="*.ogg" if="web"/>
-	<assets path="assets/week4"    library="week4"    exclude="*.mp3" unless="web"/>
-	<assets path="assets/week5"    library="week5"    exclude="*.ogg" if="web"/>
-	<assets path="assets/week5"    library="week5"    exclude="*.mp3" unless="web"/>
-	<assets path="assets/week6"    library="week6"    exclude="*.ogg" if="web"/>
-	<assets path="assets/week6"    library="week6"    exclude="*.mp3" unless="web"/>
-	<assets path="assets/bonusWeek"    library="bonusWeek"    exclude="*.mp3" unless="web"/>
-	<assets path="assets/bonusWeek"    library="bonusWeek"    exclude="*.ogg" if="web"/>
-	<assets path="assets/replays"    library="replays"/>
-	<assets path='example_mods' rename='mods' embed='false'/>
-	<assets path='art/readme.txt' rename='do NOT readme.txt' />
-	<!-- <template path='mods' /> -->
-	
-	<assets path="CHANGELOG.md" rename='changelog.txt'/>
+	<define name="NO_PRELOAD_ALL" unless="PRELOAD_ALL" />
 
-	<!-- NOTE FOR FUTURE SELF SINCE FONTS ARE ALWAYS FUCKY 
-		TO FIX ONE OF THEM, I CONVERTED IT TO OTF. DUNNO IF YOU NEED TO
-		THEN UHHH I USED THE NAME OF THE FONT WITH SETFORMAT() ON THE TEXT!!!
-		NOT USING A DIRECT THING TO THE ASSET!!!
+	<section if="PRELOAD_ALL">
+		<library name="songs"     preload="true" />
+		<library name="shared"    preload="true" />
+		<library name="tutorial"  preload="true" />
+		<library name="week1"     preload="true" />
+		<library name="week2"     preload="true" />
+		<library name="week3"     preload="true" />
+		<library name="week4"     preload="true" />
+		<library name="week5"     preload="true" />
+		<library name="week6"     preload="true" />
+		<library name="bonusWeek" preload="true" />
+	</section>
+
+	<section if="NO_PRELOAD_ALL">
+		<library name="songs"     preload="false" />
+		<library name="shared"    preload="false" />
+		<library name="tutorial"  preload="false" />
+		<library name="week1"     preload="false" />
+		<library name="week2"     preload="false" />
+		<library name="week3"     preload="false" />
+		<library name="week4"     preload="false" />
+		<library name="week5"     preload="false" />
+		<library name="week6"     preload="false" />
+		<library name="bonusWeek" preload="false" />
+	</section>
+
+	<!-- _____________________ Per-Library Asset Mappings ______________________ -->
+
+	<assets path="assets/songs"     library="songs"     exclude="*.ogg" if="web" />
+	<assets path="assets/songs"     library="songs"     exclude="*.mp3" unless="web" />
+
+	<assets path="assets/shared"    library="shared"    exclude="*.ogg" if="web" />
+	<assets path="assets/shared"    library="shared"    exclude="*.mp3" unless="web" />
+
+	<assets path="assets/tutorial"  library="tutorial"  exclude="*.ogg" if="web" />
+	<assets path="assets/tutorial"  library="tutorial"  exclude="*.mp3" unless="web" />
+
+	<assets path="assets/week1"     library="week1"     exclude="*.ogg" if="web" />
+	<assets path="assets/week1"     library="week1"     exclude="*.mp3" unless="web" />
+
+	<assets path="assets/week2"     library="week2"     exclude="*.ogg" if="web" />
+	<assets path="assets/week2"     library="week2"     exclude="*.mp3" unless="web" />
+
+	<assets path="assets/week3"     library="week3"     exclude="*.ogg" if="web" />
+	<assets path="assets/week3"     library="week3"     exclude="*.mp3" unless="web" />
+
+	<assets path="assets/week4"     library="week4"     exclude="*.ogg" if="web" />
+	<assets path="assets/week4"     library="week4"     exclude="*.mp3" unless="web" />
+
+	<assets path="assets/week5"     library="week5"     exclude="*.ogg" if="web" />
+	<assets path="assets/week5"     library="week5"     exclude="*.mp3" unless="web" />
+
+	<assets path="assets/week6"     library="week6"     exclude="*.ogg" if="web" />
+	<assets path="assets/week6"     library="week6"     exclude="*.mp3" unless="web" />
+
+	<assets path="assets/bonusWeek" library="bonusWeek" exclude="*.mp3" unless="web" />
+	<assets path="assets/bonusWeek" library="bonusWeek" exclude="*.ogg" if="web" />
+
+	<assets path="assets/replays"   library="replays" />
+
+	<!-- __________________________ Mod / Extra Files __________________________ -->
+
+	<!--
+		MODS ON ANDROID:
+		  Android apps cannot read arbitrary folders outside the APK without
+		  explicit file-provider setup and user permissions.
+		  Mods (example_mods) are therefore excluded on Android to avoid crashes.
+		  Guard all mod-loading code in Haxe with  #if !android ... #end.
 	-->
-	<assets path="assets/fonts" embed='true'/>
+	<assets path="example_mods" rename="mods" embed="false" unless="android" />
+
+	<!-- Art readme — desktop/web only -->
+	<assets path="art/readme.txt" rename="do NOT readme.txt" unless="android" />
+
+	<!-- Changelog bundled as a readable text file -->
+	<assets path="CHANGELOG.md" rename="changelog.txt" />
+
 	<!-- _______________________________ Libraries ______________________________ -->
 
+	<!-- Core HaxeFlixel -->
 	<haxelib name="flixel" />
-	<haxedev set='webgl' />
-
-	<!--In case you want to use the addons package-->
+	<haxedev set="webgl" />
 	<haxelib name="flixel-addons" />
+	<haxelib name="flixel-ui" />
+
+	<!-- Scripting -->
 	<haxelib name="hscript" />
 
-	<!--In case you want to use the ui package-->
-	<haxelib name="flixel-ui" />
-	<haxelib name="newgrounds"/>
-	<haxelib name="faxe" if='switch'/>
-	<haxelib name="polymod"/>
-	<haxelib name="discord_rpc" if="windows"/>
-	<haxelib name="linc_luajit" if="windows"/>
+	<!-- Newgrounds SDK -->
+	<haxelib name="newgrounds" />
 
-	<!-- <haxelib name="hxcpp-debug-server" if="desktop"/> -->
+	<!-- Switch audio -->
+	<haxelib name="faxe" if="switch" />
 
-	<!-- <haxelib name="markdown" /> -->
-	<!-- <haxelib name="HtmlParser" /> -->
+	<!-- Mod support -->
+	<haxelib name="polymod" unless="android" />
 
-	<!--In case you want to use nape with flixel-->
-	<!--<haxelib name="nape-haxe4" />-->
+	<!--
+		Discord RPC — desktop only (no Android support in this lib).
+		Lua scripting via linc_luajit — desktop only (JIT not available on Android).
+	-->
+	<haxelib name="discord_rpc"  if="windows" />
+	<haxelib name="linc_luajit"  if="windows" />
+
+	<!-- <haxelib name="hxcpp-debug-server" if="desktop" /> -->
 
 	<!-- ______________________________ Haxedefines _____________________________ -->
 
-	<!--Enable the Flixel core recording system-->
-	<!--<haxedef name="FLX_RECORD" />-->
+	<!-- Enable the Flixel core recording system -->
+	<!-- <haxedef name="FLX_RECORD" /> -->
 
-	<!--Disable the right and middle mouse buttons-->
+	<!-- Disable the right and middle mouse buttons -->
 	<!-- <haxedef name="FLX_NO_MOUSE_ADVANCED" /> -->
 
-	<!--Disable the native cursor API on Flash-->
-	<!--<haxedef name="FLX_NO_NATIVE_CURSOR" />-->
+	<!-- Disable the native cursor API on Flash -->
+	<!-- <haxedef name="FLX_NO_NATIVE_CURSOR" /> -->
 
-	<!--Optimise inputs, be careful you will get null errors if you don't use conditionals in your game-->
-	<!-- <haxedef name="FLX_NO_MOUSE" if="mobile" /> -->
-	<!-- <haxedef name="FLX_NO_KEYBOARD" if="mobile" /> -->
-	<!-- <haxedef name="FLX_NO_TOUCH" if="desktop" /> -->
-	<!--<haxedef name="FLX_NO_GAMEPAD" />-->
+	<!--
+		On Android, touch input replaces mouse/keyboard.
+		Uncomment these if you want to trim unused input subsystems:
+		<haxedef name="FLX_NO_MOUSE"    if="android" />
+		<haxedef name="FLX_NO_KEYBOARD" if="android" />
+		<haxedef name="FLX_NO_TOUCH"    if="desktop" />
+	-->
 
-	<!--Disable the Flixel core sound tray-->
-	<!--<haxedef name="FLX_NO_SOUND_TRAY" />-->
+	<!-- Disable the Flixel core sound tray -->
+	<!-- <haxedef name="FLX_NO_SOUND_TRAY" /> -->
 
-	<!--Disable the Flixel sound management code-->
-	<!--<haxedef name="FLX_NO_SOUND_SYSTEM" />-->
+	<!-- Disable the Flixel sound management code -->
+	<!-- <haxedef name="FLX_NO_SOUND_SYSTEM" /> -->
 
-	<!--Disable the Flixel core focus lost screen-->
+	<!-- Disable the Flixel core focus lost screen -->
 	<haxedef name="FLX_NO_FOCUS_LOST_SCREEN" />
 
-	<!--Disable the Flixel core debugger. Automatically gets set whenever you compile in release mode!-->
+	<!-- Disable the Flixel core debugger in release builds -->
 	<haxedef name="FLX_NO_DEBUG" unless="debug" />
 
-	<!--Enable this for Nape release builds for a serious peformance improvement-->
+	<!-- Nape physics release optimisation -->
 	<haxedef name="NAPE_RELEASE_BUILD" unless="debug" />
+
+	<!--
+		ANDROID — disable Discord RPC and Lua scripting defines so
+		the code that checks  #if discord_rpc / #if linc_luajit
+		compiles cleanly without those libraries on Android.
+	-->
+	<haxedef name="NO_DISCORD"   if="android" />
+	<haxedef name="NO_LUAJIT"    if="android" />
 
 	<!-- _________________________________ Custom _______________________________ -->
 
-	<!--Place custom nodes like icons here (higher priority to override the HaxeFlixel icon)-->
-	
-	<icon path="art/icon8.png" size='8'/>
-	<icon path="art/icon16.png" size='16'/>
-	<icon path="art/icon32.png" size='32'/>
-	<icon path="art/icon64.png" size='64'/>
-	<icon path="art/icon128.png" size='128'/>
-	<icon path="art/icon256.png" size='256'/>
-	<icon path="art/icon512.png" size='512'/>
-	<icon path="art/iconOG.png" />
-
+	<!-- App icons — all sizes provided so Android adaptive icons work correctly -->
+	<icon path="art/icon8.png"   size="8"   />
+	<icon path="art/icon16.png"  size="16"  />
+	<icon path="art/icon32.png"  size="32"  />
+	<icon path="art/icon64.png"  size="64"  />
+	<icon path="art/icon128.png" size="128" />
+	<icon path="art/icon256.png" size="256" />
+	<icon path="art/icon512.png" size="512" />
+	<icon path="art/iconOG.png"  />
 
 	<!-- <haxedef name="SKIP_TO_PLAYSTATE" if="debug" /> -->
 	<haxedef name="NG_LOGIN" if="newgrounds" />
-	
+
 </project>
