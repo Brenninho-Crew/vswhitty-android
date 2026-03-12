@@ -18,12 +18,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # ── 2. Java (required by the Android SDK build tools) ────────────────────
-      - name: Set up Java 11
+      # ── 2. Java ───────────────────────────────────────────────────────────────
+      # sdkmanager v16+ (bundled with setup-android@v3) requires JDK 17 or later.
+      # Haxe/Lime itself works fine with 17 as well.
+      - name: Set up Java 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 11
+          java-version: 17
 
       # ── 3. Android SDK ────────────────────────────────────────────────────────
       - name: Set up Android SDK
@@ -50,22 +52,21 @@ jobs:
       - name: Install haxelibs
         run: |
           haxelib setup ~/haxelib
-          haxelib install lime        --quiet
-          haxelib install openfl       --quiet
-          haxelib install flixel       --quiet
+          haxelib install lime         --quiet
+          haxelib install openfl        --quiet
+          haxelib install flixel        --quiet
           haxelib install flixel-addons --quiet
-          haxelib install flixel-ui    --quiet
-          haxelib install hscript      --quiet
-          haxelib install newgrounds   --quiet
-          haxelib install polymod      --quiet
+          haxelib install flixel-ui     --quiet
+          haxelib install hscript       --quiet
+          haxelib install newgrounds    --quiet
+          haxelib install polymod       --quiet
 
       # ── 6. Configure Lime with the Android SDK / NDK paths ───────────────────
       - name: Configure Lime for Android
         run: |
-          haxelib run lime config ANDROID_SDK  $ANDROID_SDK_ROOT
-          haxelib run lime config ANDROID_NDK_ROOT \
-            $ANDROID_SDK_ROOT/ndk/21.4.7075529
-          haxelib run lime config JAVA_HOME    $JAVA_HOME
+          haxelib run lime config ANDROID_SDK      $ANDROID_SDK_ROOT
+          haxelib run lime config ANDROID_NDK_ROOT $ANDROID_SDK_ROOT/ndk/21.4.7075529
+          haxelib run lime config JAVA_HOME        $JAVA_HOME
 
       # ── 7. Build ──────────────────────────────────────────────────────────────
       - name: Build APK (debug)
@@ -76,7 +77,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: VsWhitty-android-debug
-          # Lime outputs the APK here for debug builds
           path: export/debug/android/bin/app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
           retention-days: 7
